@@ -35,8 +35,8 @@ const EventProvider = ({ children }: IChildren) => {
     await crud.add(event).then((res) => {
       setEvents([...events, res])
       toast.success(`Event "${event.title}" created!`)
-    }).catch((err) => {
-      toast.error(`Error: ${err.error}`)
+    }).catch(() => {
+      toast.error('Erro: Conflito de evento detectado')
     })
   }
 

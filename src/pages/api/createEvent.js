@@ -6,7 +6,13 @@ export default async (req, res) => {
   if (req.method === 'POST') {
     console.log('chamou aqui');
     const { description, date, startDate, endDate, title, responsible, room } = req.body;
-
+    function isConflict(event1, event2) {
+      // Verifica se há um conflito entre dois eventos
+      return (
+        (event1.start < event2.end && event1.end > event2.start) ||
+        (event2.start < event1.end && event2.end > event1.start)
+      );
+    }
     async function validateConflict() {
       return new Promise(async (resolve, reject) => {
         try {
@@ -21,27 +27,42 @@ export default async (req, res) => {
 
           // Consulta para verificar conflitos de eventos
           const conflictQuery = `
-          SELECT * FROM events
-          WHERE date = ? AND room = ?
-          AND (
-            (startDate >= ? AND startDate < ?)
-            OR (endDate > ? AND endDate <= ?)
-            OR (startDate <= ? AND endDate >= ?)
-          )
+            SELECT * FROM events
+            WHERE date = ? AND room = ? AND date ?
           `;
-          console.log('params', date, room, startDate, startDate, endDate, endDate, startDate, endDate)
-          console.log('conflictQuery', conflictQuery);
           // Execute a consulta de conflito e verifique erros
-          const [rows] = await connection.execute(conflictQuery, [date, room, startDate, startDate, endDate, endDate, startDate, endDate]);
-          console.log('rows', rows);
+          const [rows] = await connection.execute(conflictQuery, [date, room, date]);
+
           if (connection.error) {
             console.log('erro de conexao:', connection.error)
             reject(connection.error);
           }
+          connection.end();
+          if(rows.length <= 0) {
+            resolve(false);
+          }
+          const startDate = new Date(startDate);
+          const endDate = new Date(endDate);
+          const newEventRange = { start: startDate, end: endDate };
 
-          connection.end(); // Feche a conexão
+          // Itere sobre os eventos existentes
+          for (const existingEvent of rows) {
+            const existingStartDate = new Date(existingEvent.startDate);
+            const existingEndDate = new Date(existingEvent.endDate);
+            const existingEventRange = { start: existingStartDate, end: existingEndDate };
+        
+            // Verifique se há um conflito com o novo evento
+            if (isConflict(newEventRange, existingEventRange)) {
+              resolve(true); // Há um conflito
+              return;
+            }
+            else {
+              resolve(false);
+              return
+            }
+          }
 
-          resolve(rows.length > 0);
+
         } catch (error) {
           reject(error);
         }
@@ -50,7 +71,7 @@ export default async (req, res) => {
 
     try {
       const conflictExists = await validateConflict();
-
+      console.log('conflictExists', conflictExists)
       if (conflictExists) {
         // Já existe um evento em conflito
         return res.status(400).json({ error: 'Conflito de evento detectado' });
