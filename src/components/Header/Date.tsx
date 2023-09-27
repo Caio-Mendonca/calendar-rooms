@@ -1,8 +1,8 @@
 import moment from 'moment'
-
+import 'moment/locale/pt-br'
 export default function HeaderDate() {
   const now = moment()
-
+  moment.locale('pt-br')
   return (
     <span>
       <p className="text-md font-bold">{now.format('MMMM')}</p>

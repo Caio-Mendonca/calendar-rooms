@@ -1,15 +1,21 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { createContext, useContext, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 
-import { CRUD, LocalStorage } from '@/core/methods'
+import { useRouter } from 'next/router'
+import { CRUD } from '@/core/methods'
 import { IChildren, IEvents, IEventsContext } from '@/core/types'
+import moment from 'moment'
+import { getEvents } from '@/core/services/getmeets'
 
 const defaultEvents: IEventsContext = {
   events: [],
+  currentDate: new Date(),
   setEvents: () => [],
   saveEventStorage: () => null,
   removeEventStorage: () => null,
-  updateEventStorage: () => null
+  updateEventStorage: () => null,
+  updateDate: () => null,
 }
 
 const EventsContext = createContext(defaultEvents)
@@ -17,47 +23,62 @@ const EventsContext = createContext(defaultEvents)
 const useEventsContext = () => useContext(EventsContext)
 
 const EventProvider = ({ children }: IChildren) => {
-  const [events, setEvents] = useState<IEvents[]>([])
+  const [currentDate, setCurrentDate] = useState(new Date())
+  const router = useRouter()
+  const path = router.pathname
 
-  const key = 'events'
-  const local = LocalStorage()
+  const [events, setEvents] = useState<any>([])
+
   const crud = CRUD()
 
-  const saveEventStorage = (event: IEvents) => {
-    const saveEvent = crud.add(events, event)
-    local.set(key, JSON.stringify(saveEvent))
-    setEvents(saveEvent)
-    toast.success(`Event "${event.title}" created!`)
+  const saveEventStorage = async (event: IEvents) => {
+    await crud.add(event).then((res) => {
+      setEvents([...events, res])
+      toast.success(`Event "${event.title}" created!`)
+    }).catch((err) => {
+      toast.error(`Error: ${err.error}`)
+    })
   }
 
-  const removeEventStorage = (id: string) => {
-    const remove = crud.remove(events, id)
-    local.set(key, JSON.stringify(remove))
+  const removeEventStorage = async (id: string) => {
+    const remove = await crud.remove(events, id)
     setEvents(remove)
     toast.success(`Event removed!`)
   }
 
-  const updateEventStorage = (event: IEvents) => {
-    const update = crud.update(event, events)
-    local.set(key, JSON.stringify(update))
-    setEvents(update)
+  const updateEventStorage = async (event: IEvents) => {
+    console.log(event)
+    const update = await crud.update(event)
+    console.log('event.id', event.id)
+    const filter = events.filter(({ id } : any) => id === event.id)
+    console.log('1filter', filter)
+    console.log('2update', update)
+    setEvents([...filter, update])
     toast.success(`Event "${event.title}" updated!`)
+
   }
-
+  const updateDate = (date: Date) => {
+    setCurrentDate(date)
+  }
+  function updateEvents(){
+    const formattedDate = moment(currentDate).format('YYYY-MM-DD');
+    getEvents({date:formattedDate, room: path ==='/' ? 'deolinda': 'jose_mauricio'}).then((res) => {
+      setEvents(res)
+    })
+  }
   useEffect(() => {
-    const getItems = local.get(key)
-    setEvents(getItems)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setEvents])
-
+    updateEvents()
+  }, [currentDate, path])
   return (
     <EventsContext.Provider
       value={{
         events,
+        currentDate,
         setEvents,
         saveEventStorage,
         removeEventStorage,
-        updateEventStorage
+        updateEventStorage,
+        updateDate
       }}
     >
       {children}

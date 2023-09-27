@@ -18,7 +18,7 @@ const initialState: IStateContext = {
     open: false
   },
   selected: {
-    name: 'Agenda',
+    name: 'Agenda Deolinda',
     href: '/'
   }
 }

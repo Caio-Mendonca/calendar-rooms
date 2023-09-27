@@ -1,12 +1,7 @@
 import { Asset } from '@/Images'
 
 export const controls = [
-  { name: 'Agenda', href: '/', icon: Asset.Calendar },
-  { name: 'Mensagens', href: '/', icon: Asset.Message },
-  { name: 'Relatorios', href: '/', icon: Asset.Diagram }
+  { name: 'Agenda Deolinda', href: '/', icon: Asset.Calendar },
+  { name: 'Agenda José Mauricio', href: '/2', icon: Asset.Calendar },
 ]
 
-export const systems = [
-  { name: 'Configurações', href: '/', icon: Asset.Settings },
-  { name: 'Sair', href: '/', icon: Asset.Logout }
-]

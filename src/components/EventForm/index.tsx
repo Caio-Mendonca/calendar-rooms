@@ -1,10 +1,9 @@
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { v4 as uuidv4 } from 'uuid'
-
+import { useRouter } from 'next/router'
 import { useEventsContext } from '@/context/EventsContext'
 import { useStateContext } from '@/context/StateContext'
 import { IEvents } from '@/core/types'
-import { EventTypes } from '@/mocks/dataResouces'
 
 interface IEventForm {
   event?: IEvents
@@ -13,6 +12,8 @@ interface IEventForm {
 export const EventForm = ({ event }: IEventForm) => {
   const { updateEventStorage, removeEventStorage, saveEventStorage } =
     useEventsContext()
+  const router = useRouter()
+  const path = router.pathname
   const { setModal } = useStateContext()
   const { register, handleSubmit } = useForm<IEvents>()
   const onSubmit: SubmitHandler<IEvents> = (data) => {
@@ -22,7 +23,8 @@ export const EventForm = ({ event }: IEventForm) => {
       saveEventStorage(data)
     }
     setModal({ open: false })
-  }
+  }  
+
   return (
     <div className="flex w-full justify-center bg-primary p-4">
       <form onSubmit={handleSubmit(onSubmit)} className="flex w-full flex-col">
@@ -32,8 +34,23 @@ export const EventForm = ({ event }: IEventForm) => {
           type="hidden"
           value={event?.id || uuidv4()}
         />
+         <input
+          {...register('room')}
+          id="sala"
+          type="hidden"
+          value={path === '/' ? 'deolinda' : 'jose_mauricio' }
+        />
+        <label htmlFor="responsible" className="text-sm font-medium">
+          Reponsável:
+        </label>
+        <input
+          {...register('responsible', { required: true })}
+          type="text"
+          defaultValue={event?.responsible}
+          className="mb-2 rounded-lg bg-search p-2 text-sm font-medium text-navTitle"
+        />
         <label htmlFor="title" className="text-sm font-medium">
-          Title:
+          Titulo:
         </label>
         <input
           {...register('title', { required: true })}
@@ -42,7 +59,7 @@ export const EventForm = ({ event }: IEventForm) => {
           className="mb-2 rounded-lg bg-search p-2 text-sm font-medium text-navTitle"
         />
         <label htmlFor="description" className="text-sm font-medium">
-          Description:
+          Descrição:
         </label>
         <input
           {...register('description', { required: true })}
@@ -51,7 +68,7 @@ export const EventForm = ({ event }: IEventForm) => {
           className="mb-2 rounded-lg bg-search p-2 text-sm font-medium text-navTitle"
         />
         <label htmlFor="date" className="text-sm font-medium">
-          Date:
+          Data:
         </label>
         <input
           {...register('date', { required: true })}
@@ -60,7 +77,7 @@ export const EventForm = ({ event }: IEventForm) => {
           className="mb-2 rounded-lg bg-search p-2 text-sm font-medium text-navTitle"
         />
         <label htmlFor="time" className="text-sm font-medium">
-          Start at:
+          Início:
         </label>
         <input
           {...register('startDate', { required: true })}
@@ -69,7 +86,7 @@ export const EventForm = ({ event }: IEventForm) => {
           className="mb-2 rounded-lg bg-search p-2 text-sm font-medium text-navTitle"
         />
         <label htmlFor="time" className="text-sm font-medium">
-          End at:
+          Fim:
         </label>
         <input
           {...register('endDate', { required: true })}
@@ -77,21 +94,6 @@ export const EventForm = ({ event }: IEventForm) => {
           defaultValue={event?.endDate}
           className="mb-2 rounded-lg bg-search p-2 text-sm font-medium text-navTitle"
         />
-        <label htmlFor="type" className="text-sm font-medium">
-          Type of:
-        </label>
-        <select
-          {...register('type', { required: true })}
-          id="type"
-          defaultValue={event?.type}
-          className="mb-2 rounded-lg bg-search p-2 text-sm font-medium text-navTitle"
-        >
-          {EventTypes.map(({ id, text }) => (
-            <option key={id.toString()} value={id}>
-              {text}
-            </option>
-          ))}
-        </select>
         {event ? (
           <span className="flex flex-row gap-x-2">
             <button className="mt-3 flex flex-1 justify-center rounded-lg bg-navHover py-2 px-4 text-primary transition-colors hover:bg-secondary hover:text-textHover">

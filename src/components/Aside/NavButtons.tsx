@@ -1,36 +1,49 @@
 import classNames from 'classnames'
 import Link from 'next/link'
-import { useMemo } from 'react'
-
-import { useStateContext } from '@/context/StateContext'
-import { INavButtons } from '@/core/types'
+import { useRouter } from 'next/router'
 import Svg from '@/Images'
+import { Asset } from '@/Images'
 
-export default function NavButtons({ item }: INavButtons) {
-  const { selected, setSelected } = useStateContext()
+export default function NavButtons() {
+  const router = useRouter()
+  const path = router.pathname
 
-  const renderItems = useMemo(() => {
-    return item.map((item) => (
+
+
+  return <>
+      <Link href={'/'}>
+
       <span
-        key={item.name}
         className={classNames(
           'group mt-2 flex w-full cursor-pointer items-center justify-start gap-x-3 rounded-lg p-3 transition-colors hover:bg-navHover',
-          item.name === selected.name && 'bg-navHover'
+          path ==='/'?  'bg-navHover': ''
         )}
-        onClick={() => {
-          setSelected(item)
-        }}
       >
         <div style={{ minWidth: '26px' }} className="flex items-center">
-          <Svg name={item.icon} width={24} height={24} alt={item.name} />
+          <Svg name={Asset.Calendar} width={24} height={24} alt={'Agenda Deolinda'} />
         </div>
-        <Link href={item.href}>
           <a className={'menu-hide'}>
-            <small className="font-medium">{item.name}</small>
+            <small className="font-medium">Agenda Deolinda</small>
           </a>
-        </Link>
+        
       </span>
-    ))
-  }, [item, selected, setSelected])
-  return <>{renderItems}</>
+      </Link>
+      <Link href={'/2'}>
+      <span
+        className={classNames(
+          'group mt-2 flex w-full cursor-pointer items-center justify-start gap-x-3 rounded-lg p-3 transition-colors hover:bg-navHover',
+          path ==='/2'?  'bg-navHover': ''
+        )}
+      >
+        <div style={{ minWidth: '26px' }} className="flex items-center">
+          <Svg name={Asset.Calendar} width={24} height={24} alt={'Agenda José Mauricio'} />
+        </div>
+        
+          <a className={'menu-hide'}>
+            <small className="font-medium">Agenda José Mauricio</small>
+          </a>
+        
+      </span>
+      </Link>
+  </>
 }

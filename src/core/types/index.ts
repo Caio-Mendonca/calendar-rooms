@@ -20,10 +20,12 @@ export interface ISchedulerView {
 
 export interface IEventsContext {
   events: IEvents[]
+  currentDate: Date
   setEvents: React.Dispatch<React.SetStateAction<IEvents[]>>
   saveEventStorage(event: IEvents): void
   removeEventStorage(id: string): void
   updateEventStorage(event: IEvents): void
+  updateDate(date: Date): void
 }
 
 export interface IEventForm {
@@ -33,7 +35,7 @@ export interface IEventForm {
   startDate?: string
   endDate?: string
   title?: string
-  type?: string
+  responsible?: string
   edit?: boolean
 }
 
@@ -44,7 +46,8 @@ export interface IEvents {
   startDate: string
   endDate: string
   title: string
-  type: string
+  room: string
+  responsible: string
 }
 
 export interface ILocalStorage {
