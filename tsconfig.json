@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "types": ["cypress"],
     "lib": ["dom", "dom.iterable", "esnext"],
     "module": "esnext",
     "moduleResolution": "node",
