@@ -38,10 +38,10 @@ export const EventsCalendar = () => {
       </div>
       <div className="mx-8 flex w-full overflow-y-auto py-8 scrollbar-thin scrollbar-thumb-transparent xl:flex-1">
         <ScheduleView
-          events={events?.map(({ title, date, startDate, endDate, }) => ({
+          events={events?.map(({ title, date, startDate, endDate, responsible }) => ({
             startDate: new Date(`${date} ${startDate}`),
             endDate: new Date(`${date} ${endDate}`),
-            title: title.normalize()
+            title: `${responsible} - ${title.normalize()}`,
           }))}
           currentDate={currentDate}
         />

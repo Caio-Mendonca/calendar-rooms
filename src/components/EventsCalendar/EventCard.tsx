@@ -22,7 +22,7 @@ export const EventCard = (event: IEvents) => {
         })
       }}
     >
-      <p className="text-sm">{event.title}</p>
+      <p className="text-sm">{event.responsible} - {event.title}</p>
       <p className="text-xs">{formatDate}</p>
       <span className="mt-3 flex flex-row items-center gap-x-2">
         <Clock />
